@@ -33,7 +33,7 @@ int hex_to_hash(const char *hex, ObjectID *id_out) {
         if (sscanf(hex + i * 2, "%2x", &byte) != 1) return -1;
         id_out->hash[i] = (uint8_t)byte;
     }
-    return 0;
+    return 0; /* clean */
 }
 
 void compute_hash(const void *data, size_t len, ObjectID *id_out) {
@@ -138,7 +138,7 @@ int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out
         return -1;
     }
     
-    // fsync(fd);
+    fsync(fd);
     close(fd);
     
     if (rename(tmp_path, path) != 0) {
@@ -153,7 +153,7 @@ int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out
     }
     
     free(full_data);
-    return 0;
+    return 0; /* clean */
 }
 
 // Read an object from the store.
@@ -244,5 +244,5 @@ int object_read(const ObjectID *id, ObjectType *type_out, void **data_out, size_
     memcpy(*data_out, null_ptr + 1, size);
     
     free(full_data);
-    return 0;
+    return 0; /* clean */
 }
