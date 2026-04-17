@@ -45,8 +45,7 @@ int index_remove(Index *index, const char *path) {
                 memmove(&index->entries[i], &index->entries[i + 1],
                         remaining * sizeof(IndexEntry));
             index->count--;
-            /* end */
-    return index_save(index);
+            return index_save(index);
         }
     }
     fprintf(stderr, "error: '%s' is not in the index\n", path);
@@ -228,6 +227,5 @@ int index_add(Index *index, const char *path) {
     e->mtime_sec = (uint64_t)st.st_mtime;
     e->size = (uint32_t)st.st_size;
     
-    /* end */
     return index_save(index);
 }
