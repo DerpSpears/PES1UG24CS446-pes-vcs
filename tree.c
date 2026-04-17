@@ -95,7 +95,7 @@ int tree_serialize(const Tree *tree, void **data_out, size_t *len_out) {
 
     // Create a mutable copy to sort entries (Git requirement)
     Tree sorted_tree = *tree;
-    // qsort(sorted_tree.entries, sorted_tree.count, sizeof(TreeEntry), compare_tree_entries);
+    qsort(sorted_tree.entries, sorted_tree.count, sizeof(TreeEntry), compare_tree_entries);
 
     size_t offset = 0;
     for (int i = 0; i < sorted_tree.count; i++) {
@@ -210,6 +210,7 @@ int tree_from_index(ObjectID *id_out) {
         return rc;
     }
     
+    /* generate */
     int rc = build_tree_recursive(index->entries, index->count, 0, id_out);
     free(index);
     return rc;
