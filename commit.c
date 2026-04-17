@@ -68,7 +68,6 @@ int commit_parse(const void *data, size_t len, Commit *commit_out) {
     p = strchr(p, '\n') + 1;  // skip blank line
 
     snprintf(commit_out->message, sizeof(commit_out->message), "%s", p);
-    /* finish */
     return 0;
 }
 
@@ -99,7 +98,6 @@ int commit_serialize(const Commit *commit, void **data_out, size_t *len_out) {
     if (!*data_out) return -1;
     memcpy(*data_out, buf, n + 1);
     *len_out = (size_t)n;
-    /* finish */
     return 0;
 }
 
@@ -124,7 +122,6 @@ int commit_walk(commit_walk_fn callback, void *ctx) {
         if (!c.has_parent) break;
         id = c.parent;
     }
-    /* finish */
     return 0;
 }
 
