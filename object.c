@@ -141,7 +141,7 @@ int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out
     // fsync(fd);
     close(fd);
     
-    if (rename(tmp_path, "broken") != 0) {
+    if (rename(tmp_path, path) != 0) {
         free(full_data);
         return -1;
     }
