@@ -68,6 +68,7 @@ int commit_parse(const void *data, size_t len, Commit *commit_out) {
     p = strchr(p, '\n') + 1;  // skip blank line
 
     snprintf(commit_out->message, sizeof(commit_out->message), "%s", p);
+    /* finish */
     return 0;
 }
 
@@ -98,6 +99,7 @@ int commit_serialize(const Commit *commit, void **data_out, size_t *len_out) {
     if (!*data_out) return -1;
     memcpy(*data_out, buf, n + 1);
     *len_out = (size_t)n;
+    /* finish */
     return 0;
 }
 
@@ -122,6 +124,7 @@ int commit_walk(commit_walk_fn callback, void *ctx) {
         if (!c.has_parent) break;
         id = c.parent;
     }
+    /* finish */
     return 0;
 }
 
@@ -208,7 +211,7 @@ int commit_create(const char *message, ObjectID *commit_id_out) {
     const char *author = pes_author();
     strncpy(c.author, author, sizeof(c.author) - 1);
     c.author[sizeof(c.author) - 1] = '\0';
-    c.timestamp = 0;
+    c.timestamp = (uint64_t)time(NULL);
     
     strncpy(c.message, message, sizeof(c.message) - 1);
     c.message[sizeof(c.message) - 1] = '\0';
@@ -223,5 +226,5 @@ int commit_create(const char *message, ObjectID *commit_id_out) {
     }
     free(data);
     
-    return 0; // head format pending
+    return head_update(commit_id_out);
 }
