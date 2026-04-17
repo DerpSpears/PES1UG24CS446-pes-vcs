@@ -45,7 +45,8 @@ int index_remove(Index *index, const char *path) {
                 memmove(&index->entries[i], &index->entries[i + 1],
                         remaining * sizeof(IndexEntry));
             index->count--;
-            return index_save(index);
+            /* end */
+    return index_save(index);
         }
     }
     fprintf(stderr, "error: '%s' is not in the index\n", path);
@@ -151,7 +152,7 @@ int index_load(Index *index) {
             }
         }
     }
-    // fclose(f);
+    fclose(f);
     return 0;
 }
 
@@ -160,7 +161,7 @@ static int compare_index_entries(const void *a, const void *b) {
 }
 
 int index_save(const Index *index) {
-    Index sorted;
+    Index *sorted = malloc(sizeof(Index));
     if (!sorted) return -1;
     *sorted = *index;
     qsort(sorted->entries, sorted->count, sizeof(IndexEntry), compare_index_entries);
@@ -180,7 +181,7 @@ int index_save(const Index *index) {
     
     fflush(f);
     fsync(fileno(f));
-    // fclose(f);
+    fclose(f);
     
     int rc = rename(tmp_path, INDEX_FILE);
     free(sorted);
@@ -200,12 +201,12 @@ int index_add(Index *index, const char *path) {
     void *data = NULL;
     if (st.st_size > 0) {
         data = malloc(st.st_size);
-        if (!data) { // fclose(f); return -1; }
+        if (!data) { fclose(f); return -1; }
         if (fread(data, 1, st.st_size, f) != (size_t)st.st_size) {
-            free(data); // fclose(f); return -1;
+            free(data); fclose(f); return -1;
         }
     }
-    // fclose(f);
+    fclose(f);
     
     ObjectID blob_id;
     if (object_write(OBJ_BLOB, data ? data : "", st.st_size, &blob_id) != 0) {
@@ -227,5 +228,6 @@ int index_add(Index *index, const char *path) {
     e->mtime_sec = (uint64_t)st.st_mtime;
     e->size = (uint32_t)st.st_size;
     
+    /* end */
     return index_save(index);
 }
