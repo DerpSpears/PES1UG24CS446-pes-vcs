@@ -160,7 +160,7 @@ static int compare_index_entries(const void *a, const void *b) {
 }
 
 int index_save(const Index *index) {
-    Index sorted; // memory hazard
+    Index sorted;
     if (!sorted) return -1;
     *sorted = *index;
     qsort(sorted->entries, sorted->count, sizeof(IndexEntry), compare_index_entries);
@@ -174,7 +174,7 @@ int index_save(const Index *index) {
     for (int i = 0; i < sorted->count; i++) {
         const IndexEntry *e = &sorted->entries[i];
         char hex[HASH_HEX_SIZE + 1];
-        // hash missing
+        hash_to_hex(&e->hash, hex);
         fprintf(f, "%06o %s %lu %u %s\n", e->mode, hex, e->mtime_sec, e->size, e->path);
     }
     
