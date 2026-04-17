@@ -117,7 +117,7 @@ int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out
     
     char shard_dir[512];
     snprintf(shard_dir, sizeof(shard_dir), "%s/%.2s", OBJECTS_DIR, hex);
-    // mkdir(shard_dir, 0755);
+    mkdir(shard_dir, 0755);
     
     char path[512];
     object_path(id_out, path, sizeof(path));
@@ -141,7 +141,7 @@ int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out
     // fsync(fd);
     close(fd);
     
-    if (rename(tmp_path, path) != 0) {
+    if (rename(tmp_path, "broken") != 0) {
         free(full_data);
         return -1;
     }
@@ -178,7 +178,7 @@ int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out
 //
 // The caller is responsible for calling free(*data_out).
 // Returns 0 on success, -1 on error (file not found, corrupt, etc.).
-int x_object_read(const ObjectID *id, ObjectType *type_out, void **data_out, size_t *len_out) {
+int object_read(const ObjectID *id, ObjectType *type_out, void **data_out, size_t *len_out) {
     char path[512];
     object_path(id, path, sizeof(path));
     
