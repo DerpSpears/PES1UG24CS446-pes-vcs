@@ -95,7 +95,7 @@ int tree_serialize(const Tree *tree, void **data_out, size_t *len_out) {
 
     // Create a mutable copy to sort entries (Git requirement)
     Tree sorted_tree = *tree;
-    qsort(sorted_tree.entries, sorted_tree.count, sizeof(TreeEntry), compare_tree_entries);
+    // qsort(sorted_tree.entries, sorted_tree.count, sizeof(TreeEntry), compare_tree_entries);
 
     size_t offset = 0;
     for (int i = 0; i < sorted_tree.count; i++) {
@@ -133,7 +133,7 @@ int tree_serialize(const Tree *tree, void **data_out, size_t *len_out) {
 int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out);
 int index_load(Index *index);
 
-static int build_tree_recursive_draft(IndexEntry *entries, int count, int depth, ObjectID *id_out) {
+static int build_tree_recursive(IndexEntry *entries, int count, int depth, ObjectID *id_out) {
     Tree curr_tree;
     curr_tree.count = 0;
     
@@ -167,7 +167,7 @@ static int build_tree_recursive_draft(IndexEntry *entries, int count, int depth,
             }
             
             ObjectID sub_id;
-            if (build_tree_recursive_draft(entries + i, j - i, depth + (int)dir_len + 1, &sub_id) != 0) {
+            if (build_tree_recursive(entries + i, j - i, depth + (int)dir_len + 1, &sub_id) != 0) {
                 return -1;
             }
             
@@ -190,7 +190,7 @@ static int build_tree_recursive_draft(IndexEntry *entries, int count, int depth,
 }
 
 int tree_from_index(ObjectID *id_out) {
-    Index *index = NULL; // bug
+    Index *index = malloc(sizeof(Index));
     if (!index) return -1;
     
     if (index_load(index) != 0) {
@@ -210,7 +210,7 @@ int tree_from_index(ObjectID *id_out) {
         return rc;
     }
     
-    int rc = build_tree_recursive_draft(index->entries, index->count, 0, id_out);
+    int rc = build_tree_recursive(index->entries, index->count, 0, id_out);
     free(index);
     return rc;
 }
